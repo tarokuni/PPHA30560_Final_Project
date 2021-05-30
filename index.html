@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        .chart-container {
+            max-width: 1050px;
+            margin: auto auto;
+            /* auto centers the div */
+            border: 2px solid red;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+
+        .scrolly svg {
+            border: 2px solid purple;
+            overflow: visible;
+            position: absolute;
+            top: 5%;
+            left: 5%;
+            /* transform: translateY(-450%); */
+            width: 100%;
+            height: 4rem;
+        }
+
+
+        h1 {
+            font-size: 50px;
+            margin: 0 0;
+        }
+
+        .filler {
+            height: 0rem;
+            text-align: center;
+        }
+
+        .filler h2 {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 54px;
+        }
+
+
+        .filler p {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 25px;
+            text-align: left;
+            margin: 20px auto;
+            line-height: 1.2;
+            max-width: 600px
+            
+        }
+
+        #scrolly-overlay .scrolly {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 24px;
+            max-width: 60rem;
+            margin: 0 auto; 
+            /* background-color: #f4f4f4; */
+            padding: 0rem;
+            position: relative;
+
+        }
+
+        #scrolly-overlay .scrolly article {
+            padding: 0;
+            max-width: 30rem;
+            margin: 20 auto;
+            position: relative;
+        }
+
+        #scrolly-overlay .scrolly article .step {
+            min-height: 67vh;
+            margin-top: 10rem;
+            margin-left: 100px;
+            margin-bottom: 40rem;
+        }
+        #scrolly-overlay .scrolly article .step:last-of-type {
+            margin-bottom: 0rem;
+        }
+
+        #scrolly-overlay .scrolly article .step.is-active p {
+            background-color: #008080; 
+        }
+
+        /* #scrolly-overlay .scrolly article .step p {
+            margin: 0;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 400;
+            background-color: #5b5b5b; 
+            transition: background-color 250ms ease-in-out;
+            color: #f4f4f4;
+        } */
+
+        #scrolly-overlay .scrolly figure.sticky {
+            /* this is the key style for the chart */
+            position: sticky;
+            width: 100%;
+            height: 70vh;
+            /* vh is the unit that divdes the viewport in units of 1/100 */
+            /* height is 50 vh = half the height of the viewport */
+            /* background: #969696; */
+            margin: 0;
+            top: 0vh;
+            /* this is how high it should be from top */
+            left: 0;
+            margin-bottom: 20rem;
+        }
+
+        /* #scrolly-overlay .scrolly figure.sticky .fig {
+            position: absolute;
+            top: 10%;
+            left: 0%;
+            transform: translateY(-50%);
+            width: 90%;
+            height: 40rem;
+            background-color: #fff;
+        } */
+/* 
+        #scrolly-overlay .scrolly figure.sticky .bar-inner {
+            width: 10%;
+            height: 100%;
+            transition: width 1s ease-in-out;
+            background-color: #daa520;
+        } */
+
+        .spacer {
+            height: 800px;
+        }
+
+
+        .source {
+            margin-top: 80px;
+            margin-left: 1050px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- <section class='filler'>
+        <h1>
+            How East Asia became the global science powerhouse - through data
+        </h1>
+    </section> -->
+
+    <section id='scrolly-overlay', class='chart-container'>
+
+        <div class='scrolly'>
+
+            <!--  sticky graphic   -->
+            <figure class='sticky'>
+                <!-- put your chart stuff here -->
+                <div class='fig'>
+                    <svg width="1050px" height="500px"></svg>
+                </div>
+            </figure>
+
+            <!--  step text   -->
+            <article>
+                <div class='step' data-width='10%' data-index='0'>
+                    <h1>East Asia as the Innovation Center - Through Data</h1>   
+                </div>  
+                <div class='step' data-width='10%' data-index='1'>
+                    <p> </p>
+                </div>
+                <div class='step' data-width='90%' data-index='2'>
+                    <p> </p>
+                </div>
+            </article>
+
+        </div>
+
+    </section>
+
+    <section class='filler'>
+        <div class="spacer"></div>
+        <p>
+            Still, many people are uninsured. There is growing need for health insurance during the current pandemic.
+        </p>
+
+        </br>
+        </br>
+    </section>
+</body>
+
+<!-- add your script blocks at the end -->
+<script src="https://d3js.org/d3.v6.min.js"></script>
+<script src="https://unpkg.com/enter-view@1.0.0/enter-view.min.js"></script>
+<!-- https://github.com/russellgoldenberg/enter-view -->
+
+
+<script>
+    const container = d3.select('#scrolly-overlay');
+    const stepSel = container.selectAll('.step'); //final all the step nodes
+
+    function updateChart(index) {
+        const sel = container.select(`[data-index='${index}']`);
+        const width_in = sel.attr('data-width');
+        stepSel.classed('is-active', (d, i) => i === index);
+        // container.select('.bar-inner').style('width', width_in);
+    }
+
+    let width = 850;
+    let height = 500;
+
+    let svg = d3.select("body").select("svg")
+
+
+    function init() {
+        var bg = d3.csv("MSTI_PUB_25052021202220340.csv").then(function (data) {
+            console.log("loaded")
+            console.log({data})
+
+            let margin =  { top: 20, right: 10, bottom: 10, left: 10 };
+            
+            data.forEach(function (row) {
+                // console.log(row.recognition)
+                row.Year = +row.Year
+                row.Value = +row.Value
+            })
+
+            let chart = "G_PPP";
+
+            let full_data = [...data].filter(d => d.YEAR >= 2000 & d.COU != "OECD" & d.COU != "EU27_2020" )
+            
+
+            let dG_PPP = [...full_data].filter(d => d.MSTI_VAR == "G_PPP")
+            let dG_XGDP = [...full_data].filter(d => d.MSTI_VAR == "G_XGDP")
+
+            let bg3 = svg.append("rect")
+                .attr("x", margin.left)
+                .attr("y", 0)
+                .attr("width", width)
+                .attr("height", height)
+                .style("fill", "rgba(0,23,33,.02)")
+
+            let x = d3.scaleLinear()
+                .domain(d3.extent([2000, 2019])) 
+                .range([margin.left, width - margin.right])
+
+
+            let xAxisSettings = d3.axisBottom(x)
+
+            xAxisSettings
+                .tickValues([2000,2005,2010,2015,2019])
+                .tickSize(10)
+                .tickFormat(d => d) 
+                .tickPadding(10)
+
+            //adding to the axes to our chart
+            let xAxisTicks = svg.append("g")
+                .attr("class", "x axis") //give each axis a class
+                .call(xAxisSettings)
+                .attr("transform", `translate(0,${height - margin.bottom})`)
+
+
+
+            //in this case we need to use scaleLinear because we're dealin linear data
+            let y = d3.scaleLinear()
+
+            y.domain(d3.extent(dG_PPP.map(function (d) {return d.Value})))
+                .range([height - margin.bottom, margin.top])
+
+            let yAxisSettings = d3.axisLeft(y)
+                .ticks(5) //approx how many ticks, the function will not necesarily give you that number
+                .tickSize(-width) //size of tick lines
+                .tickFormat(d3.format(",")) //what format do you want https://github.com/d3/d3-format 
+                .tickPadding(10) //distance from tick labels to tick marks
+               
+
+            let yAxisTicks = svg.append("g")
+
+            yAxisTicks
+                .attr("class", "y axis")
+                .call(yAxisSettings)
+                .attr("transform", `translate(${margin.left},0)`)
+
+
+            let line = d3.line() //define a line function   
+                .x(d => x(d.Year)) //accessing date 
+                .y(d => y(d.Value)) //accesssing value 
+
+            let grouped_data = d3.group(dG_PPP, d => d.COU)
+
+            let Country = Array.from(grouped_data.keys())
+
+            let line_path = svg.append("g")
+
+            line_path
+                .selectAll(".line")
+                .data(grouped_data)
+                .join("path")
+                .attr("class", function(d) {
+                    console.log(d[0])
+                    return "line " +  d[0]
+                })
+                .attr("d", function(d){
+                    // console.log(d[1]);
+                    return line(d[1])
+                })
+                .style("fill", "none")
+                .style("stroke", d => {
+                    // console.log(d)
+                    if(d[0] == "USA") {
+                        return "red"
+                    } else {
+                        return "#999"
+                    }
+                })
+                .style("stroke-width", d => {
+                    if(d[0] == "USA") {
+                        return "3px"
+                    } else {
+                        return "1px"
+                    }
+                })
+
+
+            let baseline = svg.append("line")
+                .attr("x1", margin.left)
+                .attr("x2", width + margin.left)
+                .attr("y1", y(0))
+                .attr("y2", y(0))
+                .style("stroke", "black")
+                .style("stroke-width", "2px")
+
+            // let baseline2 = svg.append("line")
+            //     .attr("x1", x(0))
+            //     .attr("x2", x(0))
+            //     .attr("y1", 0)
+            //     .attr("y2", y(0))
+            //     .style("stroke", "#CCC")
+            //     .style("stroke-width", "1px")
+
+
+            // text label for the x axis
+            let xlabel = svg.append("text")
+                .attr("class", "axis")             
+                .attr("transform",
+                        "translate(" + (width/2) + " ," + 
+                                    (height + margin.top + 20) + ")")
+                .style("text-anchor", "middle")
+                .style("font-size", "18px")
+                .text("Year");
+
+            // text label for the y axis
+            let ylabel = svg.append("text")
+                .attr("class", "axis")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 0 - 8 * margin.left)
+                .attr("x",0 - (height / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .style("font-size", "18px")
+                .text("Total Expenditure on R&D (current PPP $)");      
+                    
+            
+            let source = svg.append("text")
+                .attr("transform",
+                        "translate(" + (width + 50) + " ," + 
+                                    (height + 80) + ")")
+                //.attr("dy", "1em")
+                .attr("class", "source")
+                .style("text-anchor", "end")
+                .text("Source: OECD Main Science and Technology Indicators")
+
+
+            // var hed = d3.select(".headline")
+
+            // function update() {
+            //     console.log("update")
+
+            //     if (chart == "G_PPP") {
+            //         chart = "G_XGDP"
+            //         bg.dance(dG_XGDP)
+            //         hed.html("Total Expenditure on R&D")
+
+            //     } else {
+            //         year_state = "G_XGDP"
+            //         bg.dance(dG_PPP)
+            //         hed.html("R&D Expenditure as a percentage of GDP")
+            //     }
+            //     console.log("Change chart");
+            // }
+
+            dance = function(filtered_data) {
+
+                var t = d3.transition() 
+                    .duration(800)
+                    .ease(d3.easeLinear)
+
+            //in this case we need to use scaleLinear because we're dealin linear data
+                
+                y.domain(d3.extent(filtered_data.map(d => d.Value)))
+                    .range([height - margin.bottom, margin.top])
+
+                yAxisTicks
+                    .attr("class", "y axis")
+                    .attr("transform", `translate(${margin.left},0)`)
+                    .transition(t)
+                    .call(yAxisSettings)
+
+                // line.x(d => x(d.Year)) //accessing date 
+                //     .y(d => y(d.Value)) //accesssing value 
+
+
+                let grouped_data = d3.group(filtered_data, d => d.COU)
+                // let grouped_data = filtered_data.filter(d => d.COU == "USA")
+
+                line_path
+                    .selectAll(".line")
+                    .data(grouped_data)
+                    .join("path")
+                    .attr("class", function(d) {
+                        // console.log(d[0])
+                        return "line " +  d[0]
+                    })
+                    .transition(t)
+                    .attr("d", function(d){
+                        console.log({d});
+                        return line(d[1]);
+                    })
+                    .style("fill", "none")
+                    .style("stroke", d => {
+                        // console.log(d)
+                        if(d[0] == "USA") {
+                            return "red"
+                        } else {
+                            return "#999"
+                        }
+                    })
+                    .style("stroke-width", d => {
+                        if(d[0] == "USA") {
+                            return "3px"
+                        } else {
+                            return "1px"
+                        }
+                    })
+                    console.log(line_path)
+
+            };
+
+            // legends
+            // let legendVals = ["Medicare and Medicaid", "Subsidized Exchange", "CHIP", "Military", "Other"] ;
+            // let position = [440,640,825,900,980]
+            // let colors = ["#FDD835", "#F06292", "#5C6BC0", "#90A4AE", "#E0E0E0"]
+
+        
+            // var legend = svg.selectAll('.legends')　
+            //     .data(legendVals)
+            //     .enter()
+            //         .append('g')
+            //     .attr("class", "legends")
+            //     .attr("transform", function (d, i) {
+            //         {
+            //             return "translate(" + position[i] + ", 0)" 
+            //         }
+            //     })
+
+            // legend.append('rect')
+            //     .attr("x", 0)
+            //     .attr("y", 0)
+            //     .attr("width", 10)
+            //     .attr("height", 10)
+            //     .style("fill", function (d, i) { return colors[i]; }) 
+
+            // legend.append('text') 
+            //     .attr("x", 20)
+            //     .attr("y", 10)
+            //     .text(function (d, i) {	return d ;})
+            //     .attr("class", "textselected")
+            //     .style("text-anchor", "start")
+            //     .style("font-size", 15)
+
+            
+
+            enterView({ //our main view function
+                selector: stepSel.nodes(),
+                offset: 0.5, //when the slide is 50% away then trigger your chart
+                enter: el => { //what's supposed to happen when the slide enters?
+                    let index = +d3.select(el).attr('data-index');
+                    if (index == 1) {
+                        dance(dG_XGDP)          
+                        // hed.html("Total Expenditure on R&D")
+                    }
+                    console.log(0)
+                },
+                exit: el => { //what's supposed to happen when the slide exits?
+                    dance(dG_PPP)
+                    console.log(1)
+                }
+            });
+        })  
+
+    }
+
+    init();
+</script>
