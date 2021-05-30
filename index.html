@@ -190,7 +190,7 @@
                 </div>
                 <div class='step' data-width='90%' data-index='4'>
                     <p>Following up are Taiwan, Sweden, and Japan, all with strong tech industries.</p>
-                    <p>Finland has also had high percentage expenditures in recent years.</p>
+                    <p>Finland, the home of Nokia, has also had high percentage expenditures in recent years.</p>
                 </div>
                 <div class='step' data-width='90%' data-index='5'>
                     <p> </p>
@@ -420,21 +420,45 @@
                 .attr("opacity", 0)
                 // .style("fill", "white")
 
+            let Taiwan_s = svg.append('rect')
+                .attr("x", 470)
+                .attr("y", 236)
+                .attr("width", 15)
+                .attr("height", 15)
+                .style("fill", "limegreen")
+                .attr("opacity", 0)
+
             let Sweden = svg.append("text") // lightseagreen
                 .attr("class", "label")
-                .attr("x", 680)
-                .attr("y", 240)
+                .attr("x", 705)
+                .attr("y", 168)
                 .text("Sweden")
                 .attr("opacity", 0)
                 // .style("fill", "white")
 
-            let Finland = svg.append("text") // lightseagreen
+            let Sweden_s = svg.append('rect')
+                .attr("x", 685)
+                .attr("y", 154)
+                .attr("width", 15)
+                .attr("height", 15)
+                .style("fill", "lightseagreen")
+                .attr("opacity", 0)
+
+            let Finland = svg.append("text") // darkkhaki
                 .attr("class", "label")
-                .attr("x", 420)
-                .attr("y", 130)
+                .attr("x", 465)
+                .attr("y", 135)
                 .text("Finland")
                 .attr("opacity", 0)
                 // .style("fill", "white")
+
+            let Finland_s = svg.append('rect') 
+                .attr("x", 445)
+                .attr("y", 121)
+                .attr("width", 15)
+                .attr("height", 15)
+                .style("fill", "darkkhaki")
+                .attr("opacity", 0)
 
             // // text label for the x axis
             // let xlabel = svg.append("text")
@@ -535,7 +559,7 @@
                             } else if (d[0] == "SWE") {
                                 return "lightseagreen"
                             } else if (d[0] == "FIN") {
-                                return "aqua"
+                                return "darkkhaki"
                             } else {
                                 return "#999"
                             }
@@ -695,7 +719,26 @@
                             }
                         })
 
+                    Taiwan_s.transition(t)
+                        .attr("opacity", d =>{
+                            if (filtered_data ==  dG_XGDP3) {
+                                return 1
+                            } else {
+                                return 0
+                            }
+                        })
+
+
                     Sweden.transition(t)
+                        .attr("opacity", d =>{
+                            if (filtered_data ==  dG_XGDP3) {
+                                return 1
+                            } else {
+                                return 0
+                            }
+                        })
+
+                    Sweden_s.transition(t)
                         .attr("opacity", d =>{
                             if (filtered_data ==  dG_XGDP3) {
                                 return 1
@@ -712,6 +755,16 @@
                                 return 0
                             }
                         })
+
+                    Finland_s.transition(t)
+                        .attr("opacity", d =>{
+                            if (filtered_data ==  dG_XGDP3) {
+                                return 1
+                            } else {
+                                return 0
+                            }
+                        })
+
 
 
             };
