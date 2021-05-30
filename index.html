@@ -8,12 +8,12 @@
             max-width: 1050px;
             margin: auto auto;
             /* auto centers the div */
-            border: 2px solid red;
+            /* border: 2px solid red; */
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
         }
 
         .scrolly svg {
-            border: 2px solid purple;
+            /* border: 2px solid purple; */
             overflow: visible;
             position: absolute;
             top: 5%;
@@ -52,7 +52,7 @@
 
         #scrolly-overlay .scrolly {
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-            font-size: 24px;
+            font-size: 20px;
             max-width: 60rem;
             margin: 0 auto; 
             /* background-color: #f4f4f4; */
@@ -79,8 +79,8 @@
         }
 
         #scrolly-overlay .scrolly article .step:first-of-type {
-            margin-top: -90vh;
-            background-color: #f4f4f4;
+            margin-top: -95vh;
+            background-color: rgba(240, 240, 240, 0.8);
             padding: 10px;
         }
 /* 
@@ -91,7 +91,7 @@
         #scrolly-overlay .scrolly article .step p {
             margin: 0;
             padding: 1rem;
-            text-align: center;
+            text-align: left;
             font-weight: 400;
             background-color: #5b5b5b; 
             transition: background-color 250ms ease-in-out;
@@ -138,8 +138,14 @@
         .source {
             margin-top: 80px;
             margin-left: 1050px;
-            font-size: 20px;
+            font-size: 15px;
         }
+
+
+        .y .tick line {
+            stroke: rgba(0, 0, 0, .2);
+        }
+
     </style>
 </head>
 
@@ -165,12 +171,22 @@
             <!--  step text   -->
             <article>
                 <div class='step' data-width='10%' data-index='0'>
-                    <h1>East Asia as an Innovation Center - Through Data</h1>   
+                    <h1>Which Country has the most Innovation Potential?</h1>   
                 </div>  
                 <div class='step' data-width='10%' data-index='1'>
-                    <p> </p>
+                    <p>Research & Development (R&D) expenditure is a convenient index to measure a country's innovation capacity. </p>
+                    <p>Today, the US and China lead the world, both increasing their expenditure rapidly. But this is mainly due to the size and growth of the economy in both countries.</p>
                 </div>
                 <div class='step' data-width='90%' data-index='2'>
+                    <p>In terms of expenditure per GDP, these countries do not necessarily lead the world</p>
+                </div>
+                <div class='step' data-width='90%' data-index='3'>
+                    <p> </p>
+                </div>
+                <div class='step' data-width='90%' data-index='4'>
+                    <p> </p>
+                </div>
+                <div class='step' data-width='90%' data-index='5'>
                     <p> </p>
                 </div>
             </article>
@@ -234,6 +250,9 @@
 
             let dG_PPP = [...full_data].filter(d => d.MSTI_VAR == "G_PPP")
             let dG_XGDP = [...full_data].filter(d => d.MSTI_VAR == "G_XGDP")
+            let dG_XGDP2 = [...full_data].filter(d => d.MSTI_VAR == "G_XGDP")
+            let dG_XGDP3 = [...full_data].filter(d => d.MSTI_VAR == "G_XGDP")
+            let dG_XGDP4 = [...full_data].filter(d => d.MSTI_VAR == "G_XGDP")
 
 
 
@@ -267,7 +286,7 @@
 
             let y = d3.scaleLinear()
 
-            y.domain(d3.extent(dG_PPP.map(function (d) {return d.Value})))
+            y.domain(d3.extent([0,650000]))
                 .range([height - margin.bottom, margin.top])
 
             let yAxisSettings = d3.axisLeft(y)
@@ -284,7 +303,6 @@
                 .call(yAxisSettings)
                 .attr("transform", `translate(${margin.left},0)`)
 
-
             
             let baseline = svg.append("line")
                 .attr("x1", margin.left)
@@ -293,6 +311,7 @@
                 .attr("y2", y(0))
                 .style("stroke", "black")
                 .style("stroke-width", "2px")
+                .raise()
             
 
 
@@ -356,6 +375,22 @@
                 .text("China")
                 // .style("fill", "white")
 
+            let Korea = svg.append("text")
+                .attr("class", "label")
+                .attr("x", 680)
+                .attr("y", 140)
+                .text("South Korea")
+                .attr("opacity", 0)
+                // .style("fill", "white")
+
+            let Israel = svg.append("text")
+                .attr("class", "label")
+                .attr("x", 640)
+                .attr("y", 50)
+                .text("Israel")
+                .attr("opacity", 0)
+                // .style("fill", "white")
+
 
             // text label for the x axis
             let xlabel = svg.append("text")
@@ -367,16 +402,16 @@
                 .style("font-size", "18px")
                 .text("Year");
 
-            // text label for the y axis
-            let ylabel = svg.append("text")
-                .attr("class", "axis")
-                .attr("transform", "rotate(-90)")
-                .attr("y", 0 - 8 * margin.left)
-                .attr("x",0 - (height / 2))
-                .attr("dy", "1em")
-                .style("text-anchor", "middle")
-                .style("font-size", "18px")
-                .text("Total Expenditure on R&D (current PPP $)");      
+            // // text label for the y axis
+            // let ylabel = svg.append("text")
+            //     .attr("class", "axis")
+            //     .attr("transform", "rotate(-90)")
+            //     .attr("y", 0 - 8 * margin.left)
+            //     .attr("x",0 - (height / 2))
+            //     .attr("dy", "1em")
+            //     .style("text-anchor", "middle")
+            //     .style("font-size", "18px")
+            //     .text("Total Expenditure on R&D (current PPP $)");      
                     
             // Source
             let source = svg.append("text")
@@ -388,8 +423,20 @@
                 .style("text-anchor", "end")
                 .text("Source: OECD Main Science and Technology Indicators")
 
+            let title = svg.append("text")
+                .attr("class", "title")
+                .attr("x", 30)
+                .attr("y", 10)
+                .text("Total Expenditure on R&D (Crrent PPP $)")
+                .style("opacity", 0.3)
 
-            // var hed = d3.select(".headline")
+
+            let unit = svg.append("text")
+                .attr("class", "axis")
+                .attr("x", -60)
+                .attr("y", 80)
+                .text("million dollars")
+                .style("font-size", 12)
 
             dance = function(filtered_data) {
 
@@ -401,6 +448,8 @@
                 
                 y.domain(d3.extent(filtered_data.map(d => d.Value)))
                     .range([height - margin.bottom, margin.top])
+
+
 
                 yAxisTicks
                     .attr("class", "y axis")
@@ -431,20 +480,115 @@
                     .style("fill", "none")
                     .style("stroke", d => {
                         // console.log(d)
-                        if(d[0] == "USA") {
-                            return "red"
-                        } else {
-                            return "#999"
+                        if(filtered_data == dG_XGDP | filtered_data == dG_PPP){
+                            if(d[0] == "USA") {
+                                return "red"
+                            } else if (d[0] == "CHN") {
+                                return "orange"
+                            } else {
+                                return "#999"
+                            }
+                        } else if (filtered_data == dG_XGDP2){
+                            if(d[0] == "ISR") {
+                                return "blue"
+                            } else if (d[0] == "KOR") {
+                                return "slateblue"
+                            } else {
+                                return "#999"
+                            }
                         }
                     })
                     .style("stroke-width", d => {
-                        if(d[0] == "USA") {
-                            return "3px"
-                        } else {
-                            return "1px"
+                        if(filtered_data == dG_XGDP | filtered_data == dG_PPP){
+                            if(d[0] == "USA" | d[0] == "CHN") {
+                                return "3px"
+                            } else {
+                                return "1px"
+                            }
+                        } else if (filtered_data == dG_XGDP2){
+                            if(d[0] == "ISR" | d[0] == "KOR") {
+                                return "3px"
+                            } else {
+                                return "1px"
+                            }
                         }
                     })
-                    console.log(line_path)
+
+
+                    title.transition(t)
+                    .text(d => {
+                        if (filtered_data == dG_XGDP){
+                            return "Total Expenditure on R&D (Crrent PPP $)"
+                        }
+                        else {
+                            return "R&D expenditure as a percentage of GDP"
+                        }
+                    })
+
+
+                    USA.transition(t)
+                        .attr("x",d => {
+                            if (filtered_data == dG_PPP) {
+                                return 750
+                            } else {
+                                return 790
+                            }
+                        })
+                        .attr("y", d => {
+                            if (filtered_data == dG_PPP) {
+                                return 40
+                            } else {
+                                return 200
+                            }
+                        }).attr("opacity", d =>{
+                            if (filtered_data == dG_PPP | filtered_data == dG_XGDP ) {
+                                return 1
+                            } else {
+                                return 0
+                            }
+                        })
+
+                    China.transition(t)
+                        .attr("x",d => {
+                            if (filtered_data == dG_PPP) {
+                                return 760
+                            } else {
+                                return 780
+                            }
+                        })
+                        .attr("y", d => {
+                            if (filtered_data == dG_PPP) {
+                                return 120
+                            } else {
+                                return 280
+                            }
+                        })
+                        .attr("opacity", d =>{
+                            if (filtered_data == dG_PPP | filtered_data == dG_XGDP ) {
+                                return 1
+                            } else {
+                                return 0
+                            }
+                        })
+
+                    Korea.transition(t)
+                        .attr("opacity", d =>{
+                            if (filtered_data ==  dG_XGDP2 ) {
+                                return 1
+                            } else {
+                                return 0
+                            }
+                        })
+
+                    Israel.transition(t)
+                        .attr("opacity", d =>{
+                            if (filtered_data ==  dG_XGDP2 ) {
+                                return 1
+                            } else {
+                                return 0
+                            }
+                        })
+
 
             };
 
@@ -484,17 +628,41 @@
 
             enterView({ //our main view function
                 selector: stepSel.nodes(),
-                offset: 0.5, //when the slide is 50% away then trigger your chart
+                offset: 0.3, //when the slide is 50% away then trigger your chart
                 enter: el => { //what's supposed to happen when the slide enters?
                     let index = +d3.select(el).attr('data-index');
-                    if (index == 1) {
-                        dance(dG_XGDP)          
-                        // hed.html("Total Expenditure on R&D")
+                    if (index == 0) {
+                        dance(dG_PPP)
+                    } else if (index == 1) {
+                        dance(dG_PPP)
+                        title.style("opacity", 1.0)
+                    } else if (index == 2) {
+                        dance(dG_XGDP)
+                        title.style("opacity", 1.0)
+                    } else if (index == 3) {
+                        dance(dG_XGDP2)
+                    } else if (index == 4) {
+                        dance(dG_XGDP3)
+                        title.style("opacity", 1.0)
+                    } else {
+                        dance(dG_XGDP4)
                     }
                     console.log(0)
                 },
                 exit: el => { //what's supposed to happen when the slide exits?
-                    dance(dG_PPP)
+                let index = +d3.select(el).attr('data-index');
+                    if (index <= 2) {
+                        dance(dG_PPP)
+                        if (index == 1){
+                            title.style("opacity", 0.3)
+                        }
+                    } else if (index == 3){
+                        dance(dG_XGDP)
+                    } else if (index == 4){
+                        dance(dG_XGDP2)
+                    } else if (index == 5){
+                        dance(dG_XGDP3)
+                    }
                     console.log(1)
                 }
             });
