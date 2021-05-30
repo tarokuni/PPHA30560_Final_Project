@@ -46,11 +46,11 @@
 
         .filler p {
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-            font-size: 25px;
+            font-size: 22px;
             text-align: left;
-            margin: 20px 200px;
+            margin: 20px 300px;
             line-height: 1.2;
-            max-width: 600px
+            max-width: 850px
             
         }
 
@@ -98,21 +98,22 @@
             padding: 1rem;
             text-align: left;
             font-weight: 400;
-            background-color: #5b5b5b; 
+            background-color: rgba(240, 240, 240, 0.9);
+            /* background-color: #5b5b5b;  */
             transition: background-color 250ms ease-in-out;
-            color: #f4f4f4;
+            /* color: #f4f4f4; */
         }
 
         #scrolly-overlay .scrolly figure.sticky {
             /* this is the key style for the chart */
             position: sticky;
             width: 100%;
-            height: 70vh;
+            height: 76vh;
             /* vh is the unit that divdes the viewport in units of 1/100 */
             /* height is 50 vh = half the height of the viewport */
             /* background: #969696; */
             margin: 0;
-            top: 3vh;
+            top: 5vh;
             /* this is how high it should be from top */
             left: 0;
             margin-bottom: 20rem;
@@ -136,7 +137,7 @@
         } */
 
         .spacer {
-            height: 800px;
+            height: 400px;
         }
 
 
@@ -149,7 +150,14 @@
 
         .y .tick line {
             stroke: rgba(0, 0, 0, .2);
+            stroke-dasharray: 5 10;
         }
+
+
+        svg .y.axis .domain {
+            display: none;
+        }
+
 
     </style>
 </head>
@@ -184,13 +192,14 @@
                 </div>
                 <div class='step' data-width='90%' data-index='2'>
                     <p>In terms of expenditure per GDP, these countries do not necessarily lead the world.</p>
+                    <p>Then, who is actually focusing on R&D?</p>
                 </div>
                 <div class='step' data-width='90%' data-index='3'>
-                    <p>At the top of the per GDP expenditure, we have Israel and South Korea, both with heavy focus on emerging technologies and the tech industry.</p>
+                    <p>At the top of the per GDP expenditure, we have Israel and South Korea, both with heavy focus on emerging technologies and the tech industry (and military spending).</p>
                 </div>
                 <div class='step' data-width='90%' data-index='4'>
-                    <p>Following up are Taiwan, Sweden, and Japan, all with strong tech industries.</p>
-                    <p>Finland, the home of Nokia, has also had high percentage expenditures in recent years.</p>
+                    <p>Following up are Taiwan, Sweden, and Japan, all with strong technology-related industries.</p>
+                    <p>Finland, home to Nokia, has also had high percentage expenditures in recent years.</p>
                 </div>
                 <div class='step' data-width='90%' data-index='5'>
                     <p> </p>
@@ -204,7 +213,10 @@
     <section class='filler'>
         <div class="spacer"></div>
         <p>
-            Foo Bar
+            <a href="https://oxford.universitypressscholarship.com/view/10.1093/acprof:oso/9780190464127.001.0001/acprof-9780190464127">Research has shown</a> that a national sense of threats by external hazards 
+            (both economic and military competition) leads to increased spending on R&D, 
+            and subsequently to a strong innovation sector. 
+            The countries above very much fit into this picture, with regional economic and military competition abound.
         </p>
 
         </br>
@@ -260,15 +272,13 @@
             let dG_XGDP3 = [...full_data].filter(d => d.MSTI_VAR == "G_XGDP")
             let dG_XGDP4 = [...full_data].filter(d => d.MSTI_VAR == "G_XGDP")
 
-
-
             // Background and axes
 
             let bg3 = svg.append("rect")
                 .attr("x", margin.left)
-                .attr("y", 0)
+                .attr("y", margin.top)
                 .attr("width", width)
-                .attr("height", height)
+                .attr("height", height - margin.bottom - margin.top)
                 .style("fill", "rgba(0,23,33,.02)")
 
             let x = d3.scaleLinear()
@@ -292,13 +302,15 @@
 
             let y = d3.scaleLinear()
 
-            y.domain(d3.extent([0,650000]))
+            // y.domain([0,d3.max(data.map(function (d) { return d.Value }))])
+            //     .range([height - margin.bottom, margin.top])
+            y.domain(d3.extent(dG_PPP.map(d => d.Value)))
                 .range([height - margin.bottom, margin.top])
 
             let yAxisSettings = d3.axisLeft(y)
-                .ticks(5) //approx how many ticks, the function will not necesarily give you that number
+                .ticks(4) //approx how many ticks, the function will not necesarily give you that number
                 .tickSize(-width) //size of tick lines
-                .tickFormat(d3.format(",")) //what format do you want https://github.com/d3/d3-format 
+                .tickFormat(d => d / 1000) //what format do you want https://github.com/d3/d3-format 
                 .tickPadding(10) //distance from tick labels to tick marks
                
 
@@ -308,18 +320,6 @@
                 .attr("class", "y axis")
                 .call(yAxisSettings)
                 .attr("transform", `translate(${margin.left},0)`)
-
-            
-            let baseline = svg.append("line")
-                .attr("x1", margin.left)
-                .attr("x2", width + margin.left)
-                .attr("y1", y(0))
-                .attr("y2", y(0))
-                .style("stroke", "black")
-                .style("stroke-width", "2px")
-                .raise()
-            
-
 
             // Drawing the line chart
 
@@ -338,7 +338,7 @@
                 .data(grouped_data)
                 .join("path")
                 .attr("class", function(d) {
-                    console.log(d[0])
+                    // console.log(d[0])
                     return "line " +  d[0]
                 })
                 .attr("d", function(d){
@@ -364,6 +364,16 @@
                     }
                 })
 
+
+            
+            let baseline = svg.append("line")
+                .attr("x1", margin.left)
+                .attr("x2", width + margin.left)
+                .attr("y1", y(0))
+                .attr("y2", y(0))
+                .style("stroke", "black")
+                .style("stroke-width", "2px")
+                
 
             // Adding annotattions
             
@@ -460,15 +470,6 @@
                 .style("fill", "darkkhaki")
                 .attr("opacity", 0)
 
-            // // text label for the x axis
-            // let xlabel = svg.append("text")
-            //     .attr("class", "axis")             
-            //     .attr("transform",
-            //             "translate(" + (width/2) + " ," + 
-            //                         (height + margin.top + 20) + ")")
-            //     .style("text-anchor", "middle")
-            //     .style("font-size", "18px")
-            //     .text("Year");
                     
             // Source
             let source = svg.append("text")
@@ -482,6 +483,7 @@
 
             let title = svg.append("text")
                 .attr("class", "title")
+                .style("font-size", 25)
                 .attr("x", 30)
                 .attr("y", 10)
                 .text("Total Expenditure on R&D (Current PPP $)")
@@ -490,21 +492,41 @@
 
             let unit = svg.append("text")
                 .attr("class", "axis")
-                .attr("x", -68)
+                .attr("x", -62)
                 .attr("y", 80)
-                .text("million dollars")
+                .text("billion dollars")
                 .style("font-size", 11)
 
+            let unit2 = svg.append("text")
+                .attr("class", "axis")
+                .attr("x", -40)
+                .attr("y", 500)
+                .text("total GDP")
+                .style("font-size", 11)
+                .attr("opacity", 0)
+
+            // transition of figure     
             dance = function(filtered_data) {
 
                 var t = d3.transition() 
                     .duration(1000)
                     .ease(d3.easeLinear)
-
-            //in this case we need to use scaleLinear because we're dealin linear data
                 
                 y.domain(d3.extent(filtered_data.map(d => d.Value)))
                     .range([height - margin.bottom, margin.top])
+
+                yAxisSettings
+                    .tickFormat(d => {
+                        if (filtered_data == dG_PPP){
+                            return d / 1000
+                        } else {
+                            if (d == 4){
+                                return d + "% of  "
+                            } else {
+                                return d + "%"
+                            }
+                        }
+                    })
 
                 yAxisTicks
                     .attr("class", "y axis")
@@ -512,12 +534,7 @@
                     .transition(t)
                     .call(yAxisSettings)
 
-                // line.x(d => x(d.Year)) //accessing date 
-                //     .y(d => y(d.Value)) //accesssing value 
-
-
                 let grouped_data = d3.group(filtered_data, d => d.COU)
-                // let grouped_data = filtered_data.filter(d => d.COU == "USA")
 
                 line_path
                     .selectAll(".line")
@@ -529,7 +546,7 @@
                     })
                     .transition(t)
                     .attr("d", function(d){
-                        console.log({d});
+                        // console.log({d});
                         return line(d[1]);
                     })
                     .style("fill", "none")
@@ -595,35 +612,44 @@
                     title.transition(t)
                         .text(d => {
                             if (filtered_data != dG_PPP){
-                                return "Total Expenditure on R&D (Current PPP $)"
+                                return "R&D expenditure as a percentage of GDP"
                             }
                             else {
-                                return "R&D expenditure as a percentage of GDP"
+                                return "Total Expenditure on R&D (Current PPP $)"
                             }
                         })
 
 
                     unit.transition(t)
-                        .attr("x",d => {
-                            if (filtered_data != dG_PPP){
-                                return -55
+                        .delay(d =>{
+                            if (filtered_data == dG_PPP) {
+                                return 1000
                             } else {
-                                return -68
+                                return 0
                             }
                         })
+                        .attr("opacity", d => {
+                            if (filtered_data == dG_PPP) {
+                                return 1
+                            } else {
+                                return 0
+                            }
+                        })
+                    
+                    unit2 
+                        .transition(t)
                         .attr("y", d => {
                             if (filtered_data != dG_PPP){
                                 return 130
                             } else {
-                                return 80
+                                return 500
                             }
                         })
-                        .text(d => {
+                        .attr("opacity", d => {
                             if (filtered_data != dG_PPP){
-                                return "of total GDP"
-                            }
-                            else {
-                                return "million dollars"
+                                return 1
+                            } else {
+                                return 0
                             }
                         })
 
@@ -765,53 +791,15 @@
                             }
                         })
 
-
-
             };
 
-            // legends
-            // let legendVals = ["Medicare and Medicaid", "Subsidized Exchange", "CHIP", "Military", "Other"] ;
-            // let position = [440,640,825,900,980]
-            // let colors = ["#FDD835", "#F06292", "#5C6BC0", "#90A4AE", "#E0E0E0"]
-
-        
-            // var legend = svg.selectAll('.legends')　
-            //     .data(legendVals)
-            //     .enter()
-            //         .append('g')
-            //     .attr("class", "legends")
-            //     .attr("transform", function (d, i) {
-            //         {
-            //             return "translate(" + position[i] + ", 0)" 
-            //         }
-            //     })
-
-            // legend.append('rect')
-            //     .attr("x", 0)
-            //     .attr("y", 0)
-            //     .attr("width", 10)
-            //     .attr("height", 10)
-            //     .style("fill", function (d, i) { return colors[i]; }) 
-
-            // legend.append('text') 
-            //     .attr("x", 20)
-            //     .attr("y", 10)
-            //     .text(function (d, i) {	return d ;})
-            //     .attr("class", "textselected")
-            //     .style("text-anchor", "start")
-            //     .style("font-size", 15)
-
-            
 
             enterView({ //our main view function
                 selector: stepSel.nodes(),
                 offset: 0.3, //when the slide is 50% away then trigger your chart
                 enter: el => { //what's supposed to happen when the slide enters?
                     let index = +d3.select(el).attr('data-index');
-                    if (index == 0) {
-                        dance(dG_PPP)
-                    } else if (index == 1) {
-                        dance(dG_PPP)
+                    if (index == 1) {
                         title.style("opacity", 1.0)
                     } else if (index == 2) {
                         dance(dG_XGDP)
@@ -819,10 +807,11 @@
                         dance(dG_XGDP2)
                     } else if (index == 4) {
                         dance(dG_XGDP3)
-                    } else {
+                    } else if (index == 5) {
                         dance(dG_XGDP4)
                     }
                     console.log(0)
+                    console.log(index)
                 },
                 exit: el => { //what's supposed to happen when the slide exits?
                 let index = +d3.select(el).attr('data-index');
