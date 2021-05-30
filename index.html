@@ -20,7 +20,7 @@
             left: 5%;
             /* transform: translateY(-450%); */
             width: 100%;
-            height: 4rem;
+            height: 40rem;
         }
 
 
@@ -44,7 +44,7 @@
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             font-size: 25px;
             text-align: left;
-            margin: 20px auto;
+            margin: 20px 0;
             line-height: 1.2;
             max-width: 600px
             
@@ -64,13 +64,13 @@
         #scrolly-overlay .scrolly article {
             padding: 0;
             max-width: 30rem;
-            margin: 20 auto;
+            margin: 20 0;
             position: relative;
         }
 
         #scrolly-overlay .scrolly article .step {
-            min-height: 67vh;
-            margin-top: 10rem;
+            min-height: 6vh;
+            /* margin-top: 10rem; */
             margin-left: 100px;
             margin-bottom: 40rem;
         }
@@ -78,11 +78,17 @@
             margin-bottom: 0rem;
         }
 
+        #scrolly-overlay .scrolly article .step:first-of-type {
+            margin-top: -90vh;
+            background-color: #f4f4f4;
+            padding: 10px;
+        }
+/* 
         #scrolly-overlay .scrolly article .step.is-active p {
             background-color: #008080; 
-        }
+        } */
 
-        /* #scrolly-overlay .scrolly article .step p {
+        #scrolly-overlay .scrolly article .step p {
             margin: 0;
             padding: 1rem;
             text-align: center;
@@ -90,7 +96,7 @@
             background-color: #5b5b5b; 
             transition: background-color 250ms ease-in-out;
             color: #f4f4f4;
-        } */
+        }
 
         #scrolly-overlay .scrolly figure.sticky {
             /* this is the key style for the chart */
@@ -101,7 +107,7 @@
             /* height is 50 vh = half the height of the viewport */
             /* background: #969696; */
             margin: 0;
-            top: 0vh;
+            top: 3vh;
             /* this is how high it should be from top */
             left: 0;
             margin-bottom: 20rem;
@@ -159,7 +165,7 @@
             <!--  step text   -->
             <article>
                 <div class='step' data-width='10%' data-index='0'>
-                    <h1>East Asia as the Innovation Center - Through Data</h1>   
+                    <h1>East Asia as an Innovation Center - Through Data</h1>   
                 </div>  
                 <div class='step' data-width='10%' data-index='1'>
                     <p> </p>
@@ -208,12 +214,15 @@
 
 
     function init() {
-        var bg = d3.csv("MSTI_PUB_25052021202220340.csv").then(function (data) {
+        var bg = d3.csv("data.csv").then(function (data) {
             console.log("loaded")
             console.log({data})
 
             let margin =  { top: 20, right: 10, bottom: 10, left: 10 };
             
+
+            // Cleaning the data
+
             data.forEach(function (row) {
                 // console.log(row.recognition)
                 row.Year = +row.Year
@@ -221,12 +230,14 @@
             })
 
             let chart = "G_PPP";
-
-            let full_data = [...data].filter(d => d.YEAR >= 2000 & d.COU != "OECD" & d.COU != "EU27_2020" )
-            
+            let full_data = [...data].filter(d => d.Year >= 2000 & d.COU != "OECD" & d.COU != "EU27_2020" )
 
             let dG_PPP = [...full_data].filter(d => d.MSTI_VAR == "G_PPP")
             let dG_XGDP = [...full_data].filter(d => d.MSTI_VAR == "G_XGDP")
+
+
+
+            // Background and axes
 
             let bg3 = svg.append("rect")
                 .attr("x", margin.left)
@@ -254,9 +265,6 @@
                 .call(xAxisSettings)
                 .attr("transform", `translate(0,${height - margin.bottom})`)
 
-
-
-            //in this case we need to use scaleLinear because we're dealin linear data
             let y = d3.scaleLinear()
 
             y.domain(d3.extent(dG_PPP.map(function (d) {return d.Value})))
@@ -276,6 +284,19 @@
                 .call(yAxisSettings)
                 .attr("transform", `translate(${margin.left},0)`)
 
+
+            
+            let baseline = svg.append("line")
+                .attr("x1", margin.left)
+                .attr("x2", width + margin.left)
+                .attr("y1", y(0))
+                .attr("y2", y(0))
+                .style("stroke", "black")
+                .style("stroke-width", "2px")
+            
+
+
+            // Drawing the line chart
 
             let line = d3.line() //define a line function   
                 .x(d => x(d.Year)) //accessing date 
@@ -304,12 +325,14 @@
                     // console.log(d)
                     if(d[0] == "USA") {
                         return "red"
+                    } else if (d[0] == "CHN") {
+                        return "orange"
                     } else {
                         return "#999"
                     }
                 })
                 .style("stroke-width", d => {
-                    if(d[0] == "USA") {
+                    if(d[0] == "USA" | d[0] == "CHN") {
                         return "3px"
                     } else {
                         return "1px"
@@ -317,21 +340,21 @@
                 })
 
 
-            let baseline = svg.append("line")
-                .attr("x1", margin.left)
-                .attr("x2", width + margin.left)
-                .attr("y1", y(0))
-                .attr("y2", y(0))
-                .style("stroke", "black")
-                .style("stroke-width", "2px")
+            // Adding annotattions
+            
+            let USA = svg.append("text")
+                .attr("class", "label")
+                .attr("x", 750)
+                .attr("y", 40)
+                .text("USA")
+                // .style("fill", "white")
 
-            // let baseline2 = svg.append("line")
-            //     .attr("x1", x(0))
-            //     .attr("x2", x(0))
-            //     .attr("y1", 0)
-            //     .attr("y2", y(0))
-            //     .style("stroke", "#CCC")
-            //     .style("stroke-width", "1px")
+            let China = svg.append("text")
+                .attr("class", "label")
+                .attr("x", 760)
+                .attr("y", 120)
+                .text("China")
+                // .style("fill", "white")
 
 
             // text label for the x axis
@@ -355,7 +378,7 @@
                 .style("font-size", "18px")
                 .text("Total Expenditure on R&D (current PPP $)");      
                     
-            
+            // Source
             let source = svg.append("text")
                 .attr("transform",
                         "translate(" + (width + 50) + " ," + 
@@ -368,26 +391,10 @@
 
             // var hed = d3.select(".headline")
 
-            // function update() {
-            //     console.log("update")
-
-            //     if (chart == "G_PPP") {
-            //         chart = "G_XGDP"
-            //         bg.dance(dG_XGDP)
-            //         hed.html("Total Expenditure on R&D")
-
-            //     } else {
-            //         year_state = "G_XGDP"
-            //         bg.dance(dG_PPP)
-            //         hed.html("R&D Expenditure as a percentage of GDP")
-            //     }
-            //     console.log("Change chart");
-            // }
-
             dance = function(filtered_data) {
 
                 var t = d3.transition() 
-                    .duration(800)
+                    .duration(1000)
                     .ease(d3.easeLinear)
 
             //in this case we need to use scaleLinear because we're dealin linear data
