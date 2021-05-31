@@ -50,8 +50,9 @@
             text-align: left;
             margin: 20px 300px;
             line-height: 1.2;
-            max-width: 850px
-            
+            max-width: 850px;
+            position: relative;
+            z-index: 1;
         }
 
         #scrolly-overlay .scrolly {
@@ -70,6 +71,7 @@
             max-width: 30rem;
             margin: 20 0;
             position: relative;
+            pointer-events: none;
         }
 
         #scrolly-overlay .scrolly article .step {
@@ -88,10 +90,6 @@
             background-color: rgba(240, 240, 240, 0.8);
             padding: 10px;
         }
-/* 
-        #scrolly-overlay .scrolly article .step.is-active p {
-            background-color: #008080; 
-        } */
 
         #scrolly-overlay .scrolly article .step p {
             margin: 0;
@@ -119,23 +117,6 @@
             margin-bottom: 20rem;
         }
 
-        /* #scrolly-overlay .scrolly figure.sticky .fig {
-            position: absolute;
-            top: 10%;
-            left: 0%;
-            transform: translateY(-50%);
-            width: 90%;
-            height: 40rem;
-            background-color: #fff;
-        } */
-/* 
-        #scrolly-overlay .scrolly figure.sticky .bar-inner {
-            width: 10%;
-            height: 100%;
-            transition: width 1s ease-in-out;
-            background-color: #daa520;
-        } */
-
         .spacer {
             height: 400px;
         }
@@ -152,10 +133,27 @@
             stroke: rgba(0, 0, 0, .2);
             stroke-dasharray: 5 10;
         }
-
+        svg .y.axis {
+            font-size: 15;
+        }
 
         svg .y.axis .domain {
             display: none;
+        }
+
+        .pop-up {
+            position: absolute; 
+            border: 2px solid black;
+            border-radius: 1px;
+            line-height: 1.2;
+            /* width: 80px; */
+            pointer-events: none;
+            background-color: white;
+            padding: 10px;
+        }
+
+        path.line.trans:hover {
+            opacity: 1;
         }
 
 
@@ -178,6 +176,7 @@
                 <!-- put your chart stuff here -->
                 <div class='fig'>
                     <svg width="1050px" height="500px"></svg>
+                    <div class="pop-up"></div>
                 </div>
             </figure>
 
@@ -191,17 +190,22 @@
                     <p>Today, the US and China lead the world, both increasing their expenditure rapidly. But this is mainly due to the size and growth of the economy in both countries.</p>
                 </div>
                 <div class='step' data-width='90%' data-index='2'>
-                    <p>In terms of expenditure per GDP, these countries do not necessarily lead the world.</p>
+                    <p>In terms of expenditure per GDP, these countries do not necessarily lead the world. There are other players that focus much more of their economy on R&D.</p>
                     <p>Then, who is actually focusing on R&D?</p>
                 </div>
                 <div class='step' data-width='90%' data-index='3'>
-                    <p>At the top of the per GDP expenditure, we have Israel and South Korea, both with heavy focus on emerging technologies and the tech industry (and military spending).</p>
+                    <p>At the top of the per GDP expenditure, we have Israel and South Korea, both with heavy focus on emerging technologies and the tech industry 
+                        (and military-related R&D spending, given the geopolitical situations the two countries are in).</p>
                 </div>
                 <div class='step' data-width='90%' data-index='4'>
-                    <p>Following up are Taiwan, Sweden, and Japan, all with strong technology-related industries.</p>
+                    <p>Following are Taiwan, Sweden, and Japan, all with strong technology-related industries.</p>
                     <p>Finland, home to Nokia, has also had high percentage expenditures in recent years.</p>
                 </div>
                 <div class='step' data-width='90%' data-index='5'>
+                    <p>While China has been increasing its expenditure, other East Asian players spend a much larger percentage of their economy on R&D.
+                        Korea and Taiwan have kept pace or even exceeded the growth rate of China, the dominant player of the region today.  </p>
+                </div>
+                <div class='step' data-width='90%' data-index='6'>
                     <p> </p>
                 </div>
             </article>
@@ -213,7 +217,8 @@
     <section class='filler'>
         <div class="spacer"></div>
         <p>
-            <a href="https://oxford.universitypressscholarship.com/view/10.1093/acprof:oso/9780190464127.001.0001/acprof-9780190464127">Research has shown</a> that a national sense of threats by external hazards 
+            <a href="https://oxford.universitypressscholarship.com/view/10.1093/acprof:oso/9780190464127.001.0001/acprof-9780190464127">Research has shown</a> 
+            that a national sense of threat by external hazards 
             (both economic and military competition) leads to increased spending on R&D, 
             and subsequently to a strong innovation sector. 
             The countries above very much fit into this picture, with regional economic and military competition abound.
@@ -271,6 +276,7 @@
             let dG_XGDP2 = [...full_data].filter(d => d.MSTI_VAR == "G_XGDP")
             let dG_XGDP3 = [...full_data].filter(d => d.MSTI_VAR == "G_XGDP")
             let dG_XGDP4 = [...full_data].filter(d => d.MSTI_VAR == "G_XGDP")
+            let dG_XGDP5 = [...full_data].filter(d => d.MSTI_VAR == "G_XGDP")
 
             // Background and axes
 
@@ -302,8 +308,6 @@
 
             let y = d3.scaleLinear()
 
-            // y.domain([0,d3.max(data.map(function (d) { return d.Value }))])
-            //     .range([height - margin.bottom, margin.top])
             y.domain(d3.extent(dG_PPP.map(d => d.Value)))
                 .range([height - margin.bottom, margin.top])
 
@@ -312,7 +316,7 @@
                 .tickSize(-width) //size of tick lines
                 .tickFormat(d => d / 1000) //what format do you want https://github.com/d3/d3-format 
                 .tickPadding(10) //distance from tick labels to tick marks
-               
+
 
             let yAxisTicks = svg.append("g")
 
@@ -391,6 +395,14 @@
                 .text("China")
                 // .style("fill", "white")
 
+            let China_s = svg.append('rect')
+                .attr("x", 760)
+                .attr("y", 266)
+                .attr("width", 15)
+                .attr("height", 15)
+                .style("fill", "orange")
+                .attr("opacity", 0)
+
             let Korea = svg.append("text")
                 .attr("class", "label")
                 .attr("x", 680)
@@ -398,6 +410,14 @@
                 .text("South Korea")
                 .attr("opacity", 0)
                 // .style("fill", "white")
+                
+            let Korea_s = svg.append('rect')
+                .attr("x", 660)
+                .attr("y", 126)
+                .attr("width", 15)
+                .attr("height", 15)
+                .style("fill", "slateblue")
+                .attr("opacity", 0)
 
             let Israel = svg.append("text")
                 .attr("class", "label")
@@ -495,15 +515,69 @@
                 .attr("x", -62)
                 .attr("y", 80)
                 .text("billion dollars")
-                .style("font-size", 11)
+                .style("font-size", 12)
 
             let unit2 = svg.append("text")
                 .attr("class", "axis")
                 .attr("x", -40)
                 .attr("y", 500)
                 .text("total GDP")
-                .style("font-size", 11)
+                .style("font-size", 12)
                 .attr("opacity", 0)
+
+
+            // Mouse over
+            let line_path_trans = svg.append("g")
+
+            line_path_trans
+                .selectAll(".line")
+                .data(grouped_data)
+                .join("path")
+                .attr("class", function(d) {
+                    return "line trans " +  d[0]
+                })
+                .attr("d", function(d){
+                    return line(d[1])
+                })
+                .style("fill", "none")
+                .style("stroke", "black")
+                .style("stroke-width", "3px")
+                .attr("opacity", 0)
+
+
+
+            let popup = d3.select(".pop-up").style("opacity", 0);
+
+
+            line_path_trans.on("mouseover",  d => {
+
+
+                let lang = d.path[0].__data__[1][0].Country
+
+                popup
+                    .style("opacity", 1)
+                    .style("left", (d.x - 280) + "px")
+                    .style("top", (d.y - 100) + "px")
+                    .html(lang)
+
+
+                })
+
+
+            line_path_trans.on("mouseout", d => {
+                
+                popup
+                    .style("opacity", 0)
+
+
+            })
+
+
+
+            // // 
+            // //
+
+
 
             // transition of figure     
             dance = function(filtered_data) {
@@ -536,6 +610,7 @@
 
                 let grouped_data = d3.group(filtered_data, d => d.COU)
 
+                // Main figure 
                 line_path
                     .selectAll(".line")
                     .data(grouped_data)
@@ -580,6 +655,18 @@
                             } else {
                                 return "#999"
                             }
+                        } else if (filtered_data == dG_XGDP4){
+                            if(d[0] == "JPN") {
+                                return "darkgreen"
+                            } else if (d[0] == "TWN") {
+                                return "limegreen"
+                            } else if (d[0] == "KOR") {
+                                return "slateblue"
+                            } else if (d[0] == "CHN") {
+                                return "orange"
+                            } else {
+                                return "#999"
+                            }
                         } else {
                             return "#999"
                         }
@@ -603,11 +690,31 @@
                             } else {
                                 return ".5px"
                             }
+                        } else if (filtered_data == dG_XGDP4){
+                            if(d[0] == "CHN" | d[0] == "TWN" | d[0] == "JPN" | d[0] == "KOR") {
+                                return "3px"
+                            } else {
+                                return ".5px"
+                            }
                         } else {
-                            return ".5px"
+                            return ".5x"
                         }
                     })
 
+                    line_path_trans.selectAll(".line")
+                        .data(grouped_data)
+                        .join("path")
+                        .attr("class", function(d) {
+                            return "line trans " +  d[0]
+                        })
+                        .attr("d", function(d){
+                            return line(d[1])
+                        })
+                        .style("fill", "none")
+                        .style("stroke", "black")
+                        .style("stroke-width", "3px")
+                        // .style("opacity", 0)
+                        .raise()
 
                     title.transition(t)
                         .text(d => {
@@ -693,7 +800,17 @@
                             }
                         })
                         .attr("opacity", d =>{
-                            if (filtered_data == dG_PPP | filtered_data == dG_XGDP ) {
+                            if (filtered_data == dG_PPP | filtered_data == dG_XGDP | filtered_data == dG_XGDP4) {
+                                return 1
+                            } else {
+                                return 0
+                            }
+                        })
+
+
+                    China_s.transition(t)
+                        .attr("opacity", d =>{
+                            if (filtered_data ==  dG_XGDP4) {
                                 return 1
                             } else {
                                 return 0
@@ -702,7 +819,16 @@
 
                     Korea.transition(t)
                         .attr("opacity", d =>{
-                            if (filtered_data ==  dG_XGDP2 ) {
+                            if (filtered_data ==  dG_XGDP2 | filtered_data ==  dG_XGDP4) {
+                                return 1
+                            } else {
+                                return 0
+                            }
+                        })
+
+                    Korea_s.transition(t)
+                        .attr("opacity", d =>{
+                            if (filtered_data ==  dG_XGDP4) {
                                 return 1
                             } else {
                                 return 0
@@ -720,7 +846,7 @@
 
                     Japan.transition(t)
                         .attr("opacity", d =>{
-                            if (filtered_data ==  dG_XGDP3) {
+                            if (filtered_data ==  dG_XGDP3 | filtered_data ==  dG_XGDP4) {
                                 return 1
                             } else {
                                 return 0
@@ -729,7 +855,7 @@
 
                     Japan_s.transition(t)
                         .attr("opacity", d =>{
-                            if (filtered_data ==  dG_XGDP3) {
+                            if (filtered_data ==  dG_XGDP3 | filtered_data ==  dG_XGDP4) {
                                 return 1
                             } else {
                                 return 0
@@ -738,7 +864,7 @@
 
                     Taiwan.transition(t)
                         .attr("opacity", d =>{
-                            if (filtered_data ==  dG_XGDP3) {
+                            if (filtered_data ==  dG_XGDP3 | filtered_data ==  dG_XGDP4) {
                                 return 1
                             } else {
                                 return 0
@@ -747,7 +873,7 @@
 
                     Taiwan_s.transition(t)
                         .attr("opacity", d =>{
-                            if (filtered_data ==  dG_XGDP3) {
+                            if (filtered_data ==  dG_XGDP3 | filtered_data ==  dG_XGDP4) {
                                 return 1
                             } else {
                                 return 0
@@ -809,9 +935,11 @@
                         dance(dG_XGDP3)
                     } else if (index == 5) {
                         dance(dG_XGDP4)
+                    } else if (index == 6) {
+                        dance(dG_XGDP5)
                     }
                     console.log(0)
-                    console.log(index)
+                    // console.log(index)
                 },
                 exit: el => { //what's supposed to happen when the slide exits?
                 let index = +d3.select(el).attr('data-index');
@@ -826,6 +954,8 @@
                         dance(dG_XGDP2)
                     } else if (index == 5){
                         dance(dG_XGDP3)
+                    } else if (index == 6){
+                        dance(dG_XGDP4)
                     }
                     console.log(1)
                 }
