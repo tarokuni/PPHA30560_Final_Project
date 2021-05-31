@@ -384,24 +384,32 @@
             let USA = svg.append("text")
                 .attr("class", "label")
                 .attr("x", 750)
-                .attr("y", 40)
+                .attr("y", 45)
                 .text("USA")
                 // .style("fill", "white")
+
+            let USA_s = svg.append('rect')
+                .attr("x", 730)
+                .attr("y", 31)
+                .attr("width", 15)
+                .attr("height", 15)
+                .style("fill", "red")
+                .attr("opacity", 1)
 
             let China = svg.append("text")
                 .attr("class", "label")
                 .attr("x", 760)
-                .attr("y", 120)
+                .attr("y", 130)
                 .text("China")
                 // .style("fill", "white")
 
             let China_s = svg.append('rect')
-                .attr("x", 760)
-                .attr("y", 266)
+                .attr("x", 740)
+                .attr("y", 116)
                 .attr("width", 15)
                 .attr("height", 15)
                 .style("fill", "orange")
-                .attr("opacity", 0)
+                .attr("opacity", 1)
 
             let Korea = svg.append("text")
                 .attr("class", "label")
@@ -426,6 +434,14 @@
                 .text("Israel")
                 .attr("opacity", 0)
                 // .style("fill", "white")
+
+            let Israel_s = svg.append('rect')
+                .attr("x", 620)
+                .attr("y", 36)
+                .attr("width", 15)
+                .attr("height", 15)
+                .style("fill", "blue")
+                .attr("opacity", 0)
             
             let Japan = svg.append("text") // darkgreen
                 .attr("class", "label")
@@ -771,7 +787,7 @@
                         })
                         .attr("y", d => {
                             if (filtered_data == dG_PPP) {
-                                return 40
+                                return 45
                             } else {
                                 return 200
                             }
@@ -781,6 +797,29 @@
                                 return 1
                             } else {
                                 return 0
+                            }
+                        })
+
+                    USA_s.transition(t)
+                        .attr("opacity", d =>{
+                            if (filtered_data ==  dG_PPP | filtered_data ==  dG_XGDP) {
+                                return 1
+                            } else {
+                                return 0
+                            }
+                        })
+                        .attr("x",d => {
+                            if (filtered_data == dG_PPP) {
+                                return 730
+                            } else {
+                                return 770
+                            }
+                        })
+                        .attr("y", d => {
+                            if (filtered_data == dG_PPP) {
+                                return 31
+                            } else {
+                                return 186
                             }
                         })
 
@@ -794,7 +833,7 @@
                         })
                         .attr("y", d => {
                             if (filtered_data == dG_PPP) {
-                                return 120
+                                return 130
                             } else {
                                 return 280
                             }
@@ -810,10 +849,24 @@
 
                     China_s.transition(t)
                         .attr("opacity", d =>{
-                            if (filtered_data ==  dG_XGDP4) {
+                            if (filtered_data == dG_PPP | filtered_data == dG_XGDP | filtered_data ==  dG_XGDP4) {
                                 return 1
                             } else {
                                 return 0
+                            }
+                        })
+                        .attr("x",d => {
+                            if (filtered_data == dG_PPP) {
+                                return 740
+                            } else {
+                                return 760
+                            }
+                        })
+                        .attr("y", d => {
+                            if (filtered_data == dG_PPP) {
+                                return 116
+                            } else {
+                                return 266
                             }
                         })
 
@@ -828,7 +881,7 @@
 
                     Korea_s.transition(t)
                         .attr("opacity", d =>{
-                            if (filtered_data ==  dG_XGDP4) {
+                            if (filtered_data ==  dG_XGDP2 | filtered_data ==  dG_XGDP4) {
                                 return 1
                             } else {
                                 return 0
@@ -844,6 +897,14 @@
                             }
                         })
 
+                    Israel_s.transition(t)
+                        .attr("opacity", d =>{
+                            if (filtered_data ==  dG_XGDP2) {
+                                return 1
+                            } else {
+                                return 0
+                            }
+                        })
                     Japan.transition(t)
                         .attr("opacity", d =>{
                             if (filtered_data ==  dG_XGDP3 | filtered_data ==  dG_XGDP4) {
